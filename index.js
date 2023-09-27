@@ -3,6 +3,7 @@
 import Downloader from "nodejs-file-downloader";
 import fs from "fs";
 import minimist from "minimist";
+import consola from "consola";
 
 const argv = minimist(process.argv.slice(2));
 const url = argv.u;
@@ -51,25 +52,28 @@ async function read_sheet(sheet, folder = "fonts") {
 
   const downloads = [];
 
+  consola.start(`working on ${faces_mapped.length} files...`);
+
   for (const url of faces_mapped) {
     n_urls++;
-    const download = new Downloader({
-      url: url.url,
-      fileName: url.name,
-      directory: `${folder}/files`,
-      cloneFiles: false,
-    });
+    downloads.push(
+      new Promise(async (res, rej) => {
+        const download = new Downloader({
+          url: url.url,
+          fileName: url.name,
+          directory: `${folder}/files`,
+          cloneFiles: false,
+        });
+        await download.download();
+        res();
+      })
+    );
     raw = raw.replaceAll(url.url, `'files/${url.name}'`);
-    downloads.push(download.download());
   }
 
   await Promise.all(downloads);
-
   fs.writeFileSync(`${folder}/fonts.css`, raw, { encoding: "utf-8" });
-
-  console.log(
-    `finished ${n_urls} files in ${(performance.now() - a).toFixed(2)}ms`
-  );
+  consola.success(`finished in ${(performance.now() - a).toFixed(2)}ms!`);
 }
 
 await read_sheet(url, dir);
