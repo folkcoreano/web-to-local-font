@@ -63,6 +63,8 @@ async function read_sheet(sheet, folder = "fonts") {
     downloads.push(download.download());
   }
 
+  await Promise.all(downloads);
+
   fs.writeFileSync(`${folder}/fonts.css`, raw, { encoding: "utf-8" });
 
   console.log(
