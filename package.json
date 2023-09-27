@@ -1,6 +1,6 @@
 {
   "name": "web-to-local-font",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "index.js",
   "bin": "index.js",
   "description": "web to local font",
