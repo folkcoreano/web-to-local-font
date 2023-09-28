@@ -1,12 +1,29 @@
 {
   "name": "web-to-local-font",
-  "version": "1.2.1",
+  "version": "1.2.2",
+  "description": "Web Fonts Downloader!",
+  "repository": "folkcoreano/web-to-local-font",
   "main": "index.js",
   "bin": "index.js",
-  "description": "web to local font",
   "type": "module",
-  "keywords": [],
-  "author": "folkcoreano",
+  "keywords": [
+    "fonts",
+    "webfonts",
+    "google fonts",
+    "downloader",
+    "local",
+    "woff",
+    "woff2",
+    "css"
+  ],
+  "files": [
+    "index.js"
+  ],
+  "author": {
+    "name": "yonas",
+    "email": "folkcoreano@outlook.com",
+    "url": "https://folkcoreano.vercel.app"
+  },
   "license": "ISC",
   "dependencies": {
     "minimist": "^1.2.8",
