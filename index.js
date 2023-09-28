@@ -3,13 +3,17 @@
 import Downloader from "nodejs-file-downloader";
 import fs from "fs";
 import minimist from "minimist";
-import consola from "consola";
+import ora from "ora";
+
+const log = console.log;
 
 const argv = minimist(process.argv.slice(2));
 const url = argv.u;
 const dir = argv.f;
 
 async function read_sheet(sheet, folder = "fonts") {
+  const spinner = ora("starting... ").start();
+
   const a = performance.now();
   const download_sheet = new Downloader({
     url: sheet,
@@ -18,6 +22,9 @@ async function read_sheet(sheet, folder = "fonts") {
     cloneFiles: false,
   });
   await download_sheet.download();
+
+  spinner.text = "stylesheet loaded...";
+
   const sheet_file = fs.readFileSync(`${folder}/fonts.css`, {
     encoding: "utf-8",
   });
@@ -47,12 +54,12 @@ async function read_sheet(sheet, folder = "fonts") {
     faces_mapped.push(...src);
   }
 
+  spinner.text = `${faces_mapped.length} font files loaded...`;
+
   let raw = sheet_file;
   let n_urls = 0;
 
   const downloads = [];
-
-  consola.start(`working on ${faces_mapped.length} files...`);
 
   for (const url of faces_mapped) {
     n_urls++;
@@ -68,12 +75,17 @@ async function read_sheet(sheet, folder = "fonts") {
         res();
       })
     );
+
     raw = raw.replaceAll(url.url, `'files/${url.name}'`);
+
+    spinner.text = `downloading ${n_urls}/${faces_mapped.length}: ${url.name}... `;
   }
 
   await Promise.all(downloads);
+
   fs.writeFileSync(`${folder}/fonts.css`, raw, { encoding: "utf-8" });
-  consola.success(`finished in ${(performance.now() - a).toFixed(2)}ms!`);
+
+  spinner.succeed(`finished in ${(performance.now() - a).toFixed(2)}ms!`);
 }
 
 await read_sheet(url, dir);
