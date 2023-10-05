@@ -39,3 +39,21 @@ npx web-to-local-font -f "src/assets/css" -u "https://fonts.googleapis.com/css2?
 ```
 
 Com isso será criada uma pasta `files` contendo todos os arquivos de fontes, e ao lado dela o arquivo `fonts.css` indexando todas as fontes com suas especificações em `@font-face`.
+
+## Limpeza
+
+Se no calor do momento você baixou mais fontes do que precisava, basta apenas ir até o arquivo `fonts.css` e apagar as regras de `@font-face` que não quer mais. Após isso basta executar a ferramenta com o parâmetro `-p` e todas os arquivos indesejados serão removidos da pasta `files`.
+
+```sh
+pnpm dlx web-to-local-font -p
+bunx web-to-local-font -p
+npx web-to-local-font -p
+```
+
+É importante ressaltar que isso leva em conta o local onde foi realizado o download, então se você baixou usando o parâmetro `-f`, você precisa apontar o mesmo caminho.
+
+```sh
+pnpm dlx web-to-local-font -p -f "src/assets/css"
+bunx web-to-local-font -p -f "src/assets/css"
+npx web-to-local-font -p -f "src/assets/css"
+```
