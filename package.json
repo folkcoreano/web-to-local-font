@@ -1,7 +1,7 @@
 {
   "name": "web-to-local-font",
-  "version": "1.2.6",
-  "description": "Web Fonts Downloader!",
+  "version": "1.2.7",
+  "description": "Web Fonts Downloader.",
   "repository": "folkcoreano/web-to-local-font",
   "main": "index.js",
   "bin": "index.js",
@@ -17,7 +17,9 @@
     "css"
   ],
   "files": [
-    "index.js"
+    "index.js",
+    "package.json",
+    "README.md"
   ],
   "author": {
     "name": "yonas",

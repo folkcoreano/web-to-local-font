@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import Downloader from "nodejs-file-downloader";
-import { readFile, writeFile, readdir, rm } from "node:fs";
 import minimist from "minimist";
 import ora from "ora";
+import { readFile, writeFile, readdir, rm } from "node:fs";
 const argv = minimist(process.argv.slice(2));
 const folder = argv.f || "fonts";
 const url = argv.u;
@@ -47,7 +47,6 @@ if (url) {
           });
         faces_mapped.push(...src);
       }
-
       spinner.text = `${faces_mapped.length} font files loaded...`;
       let raw = sheet_file;
       let n_urls = 0;
@@ -78,7 +77,6 @@ if (url) {
     }
   );
 }
-
 if (purge) {
   const a = performance.now();
   readFile(
