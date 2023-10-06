@@ -143,7 +143,9 @@ if (purge) {
   );
   for (const file of files) {
     if (
-      ["woff", "woff2", "utf", "otf"].includes(file.name.split(".").at(-1)) &&
+      ["WOFF", "WOFF2", "TTF", "OTF"].includes(
+        file.name.split(".").at(-1).toUpperCase()
+      ) &&
       !computed_files.includes(file.name)
     ) {
       await fs_sync.unlink(`${file.path}/${file.name}`);
