@@ -66,47 +66,50 @@ if (url) {
 }
 if (purge) {
   const a = performance.now();
-  const sheet_file = await fs_sync.readFile(`${folder}/fonts.css`, "utf-8");
+  const r = {
+    0: "font-family",
+    1: "font-style",
+    2: "font-weight",
+    3: "font-stretch",
+    4: "font-display",
+    5: "unicode-range",
+  };
+  const sheet_file = await fs_sync.readFile(`${folder}/fonts.css`, {
+    encoding: "utf-8",
+  });
   const sheet = sheet_file
     .split("@font-face")
-    .map((face) => {
-      return {
-        face: face.split(";").map((p) => {
-          const item = p.split(":");
-          return {
-            property: item.at(0).replace("\n", "").replace("{", "").trim(),
-            value: item.at(1),
-          };
-        }),
-      };
-    })
+    .map((face) =>
+      face.split(";").map((p) => {
+        const item = p.split(":");
+        return {
+          [item.at(0).replace("\n", "").replace("{", "").trim()]: item.at(1),
+        };
+      })
+    )
     .slice(1)
     .map((e) => {
-      const font_family = e.face.find((a) => a.property === "font-family");
-      const font_style = e.face.find((a) => a.property === "font-style");
-      const font_weight = e.face.find((a) => a.property === "font-weight");
-      const font_stretch = e.face.find((a) => a.property === "font-stretch");
-      const font_display = e.face.find((a) => a.property === "font-display");
-      const src = e.face.find((a) => a.property.includes("src"));
-      const unicode_range = e.face.find((a) => a.property === "unicode-range");
-
+      const obj = {};
+      for (const v of e) {
+        obj[Object.keys(v)[0]] = Object.values(v)[0];
+      }
       return {
-        ["font-family"]: font_family ? font_family.value.trim() : "",
-        ["font-style"]: font_style ? font_style.value.trim() : "",
-        ["font-weight"]: font_weight ? font_weight.value.trim() : "",
-        ["font-stretch"]: font_stretch ? font_stretch.value.trim() : "",
-        ["font-display"]: font_display ? font_display.value.trim() : "",
-        ["src"]: src ? src.value.trim() : "",
-        ["unicode-range"]: unicode_range ? unicode_range.value.trim() : "",
+        [r[0]]: r[0] in obj ? obj[r[0]].trim() : "",
+        [r[1]]: r[1] in obj ? obj[r[1]].trim() : "",
+        [r[2]]: r[2] in obj ? obj[r[2]].trim() : "",
+        [r[3]]: r[3] in obj ? obj[r[3]].trim() : "",
+        [r[4]]: r[4] in obj ? obj[r[4]].trim() : "",
+        ["src"]: "src" in obj ? obj["src"].trim() : "",
+        [r[5]]: r[5] in obj ? obj[r[5]].trim() : "",
       };
     })
     .map((e) => {
       return {
         ...e,
         src: e.src.split(",").map((f) => {
-          const a = f.split("format(");
-          const url = a.at(0).trim().substring(5).slice(0, -2);
-          const format = a.at(1).trim().substring(1).slice(0, -2);
+          const item = f.split("format(");
+          const url = item.at(0).trim().substring(5).slice(0, -2);
+          const format = item.at(1).trim().substring(1).slice(0, -2);
           return {
             url,
             format,
@@ -114,43 +117,41 @@ if (purge) {
         }),
       };
     });
-  const sheet_p = sheet
+  const sheet_p = `${sheet
     .map((m) => {
-      return `@font-face {\n${
-        m["font-family"] && `font-family: ${m["font-family"]};\n`
-      }${m["font-style"] && `font-style: ${m["font-style"]};\n`}${
-        m["font-display"] && `font-display: ${m["font-display"]};\n`
-      }${m["font-weight"] && `font-weight: ${m["font-weight"]};\n`}${
-        m["font-stretch"] && `font-stretch: ${m["font-stretch"]};\n`
-      }${
+      return `@font-face {\n${m[r[0]] && `\t${r[0]}: ${m[r[0]]};\n`}${
+        m[r[1]] && `\t${r[1]}: ${m[r[1]]};\n`
+      }${m[r[4]] && `\t${r[4]}: ${m[r[4]]};\n`}${
+        m[r[2]] && `\t${r[2]}: ${m[r[2]]};\n`
+      }${m[r[3]] && `\t${r[3]}: ${m[r[3]]};\n`}${
         m["src"] &&
-        `src: ${m["src"].map((e) => {
+        `\tsrc: ${m["src"].map((e) => {
           return `url('${e.url}') format('${e.format}')`;
         })};\n`
-      }${m["unicode-range"] && `unicode-range: ${m["unicode-range"]};\n`}}`;
+      }${m[r[5]] && `\t${r[5]}: ${m[r[5]]};\n`}}`;
     })
-    .join("\n\n");
-  const computed_files = sheet.flatMap((a) =>
+    .join("\n\n")}\n`;
+  const sh_files = sheet.flatMap((a) =>
     a.src.map((b) => b.url.split("/").at(-1))
   );
-  const files = await fs_sync.readdir(`${folder}/files`, {
-    withFileTypes: true,
-  });
+  const files = await fs_sync.readdir(`${folder}/files`);
   console.log(
     "Removendo %d/%d arquivos...",
-    files.length - computed_files.length,
+    files.length - sh_files.length,
     files.length
   );
   for (const file of files) {
     if (
       ["WOFF", "WOFF2", "TTF", "OTF"].includes(
-        file.name.split(".").at(-1).toUpperCase()
+        file.split(".").at(-1).toUpperCase()
       ) &&
-      !computed_files.includes(file.name)
+      !sh_files.includes(file)
     ) {
-      await fs_sync.unlink(`${file.path}/${file.name}`);
+      await fs_sync.unlink(`${folder}/${file}`);
     }
   }
-  await fs_sync.writeFile(`${folder}/fonts.css`, sheet_p, "utf-8");
+  await fs_sync.writeFile(`${folder}/fonts.css`, sheet_p, {
+    encoding: "utf-8",
+  });
   console.log("Tudo pronto em %dms!", (performance.now() - a).toFixed(0));
 }
