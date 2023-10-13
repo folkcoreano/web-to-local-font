@@ -147,7 +147,7 @@ if (purge) {
       ) &&
       !sh_files.includes(file)
     ) {
-      await fs_sync.unlink(`${folder}/${file}`);
+      await fs_sync.unlink(`${folder}/files/${file}`);
     }
   }
   await fs_sync.writeFile(`${folder}/fonts.css`, sheet_p, {

@@ -1,6 +1,6 @@
 {
   "name": "web-to-local-font",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Web Fonts Downloader.",
   "repository": "folkcoreano/web-to-local-font",
   "main": "index.js",
