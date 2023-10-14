@@ -1,16 +1,27 @@
 #!/usr/bin/env node
-import fs from "node:fs";
-import fs_sync from "node:fs/promises";
-import https from "node:https";
-
 const args = process.argv;
 const purge = args.some((e) => e === "-p");
-const folder = args.some((e) => e === "-f")
-  ? args[args.indexOf("-f") + 1]
-  : "fonts";
+let folder;
+switch (args[args.indexOf("-f") + 1]) {
+  case "": {
+    folder = "fonts";
+    break;
+  }
+  case undefined: {
+    folder = "fonts";
+    break;
+  }
+  default: {
+    folder = args[args.indexOf("-f") + 1].trim();
+    break;
+  }
+}
 const url = args.some((e) => e === "-u") ? args[args.indexOf("-u") + 1] : false;
 if (url) {
   const a = performance.now();
+  const fs = await import("node:fs");
+  const fs_sync = await import("node:fs/promises");
+  const https = await import("node:https");
   await fs_sync.mkdir(`${folder}/files/`, { recursive: true });
   const sheet_path = `${folder}/fonts.css`;
   const writer = fs.createWriteStream(sheet_path);
@@ -66,6 +77,7 @@ if (url) {
 }
 if (purge) {
   const a = performance.now();
+  const fs_sync = await import("node:fs/promises");
   const r = {
     0: "font-family",
     1: "font-style",
