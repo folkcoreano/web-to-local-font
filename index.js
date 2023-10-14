@@ -2,21 +2,9 @@
 
 const args = process.argv;
 const purge = args.some((e) => e === "-p");
-let folder;
-switch (args[args.indexOf("-f") + 1]) {
-  case "": {
-    folder = "fonts";
-    break;
-  }
-  case undefined: {
-    folder = "fonts";
-    break;
-  }
-  default: {
-    folder = args[args.indexOf("-f") + 1].trim();
-    break;
-  }
-}
+const folder = args.some((e) => e === "-f")
+  ? args[args.indexOf("-f") + 1]
+  : "fonts";
 const url = args.some((e) => e === "-u") ? args[args.indexOf("-u") + 1] : false;
 if (url) {
   const a = performance.now();
