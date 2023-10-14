@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const args = process.argv;
 const purge = args.some((e) => e === "-p");
 let folder;
